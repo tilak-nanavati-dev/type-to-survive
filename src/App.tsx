@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
 import { SCORING, ZTYPES, PUPS, CW, CX, CY, DIFFICULTY_PRESETS } from "./data/config";
 import { uid, pick, rr, getWords } from "./utils/helpers";
+import { loadBest, maybeSaveBest, clearBest, type BestRun } from "./utils/storage";
 
 import useKeyboardInput from "./hooks/useKeyboardInput";
 import useVisibility from "./hooks/useVisibility";
@@ -54,6 +55,14 @@ export default function App() {
   const [catS, setCatS]     = useState<CategoryStats>({});
   const [wlog, setWlog]     = useState<WordLog[]>([]);
   const [wvS, setWvS]       = useState<WaveStats | null>(null);
+
+  /* ─── Persisted Best (localStorage) ─── */
+  const [best_, setBest_]   = useState<BestRun | null>(() => loadBest());
+  const resetBest = useCallback(() => { clearBest(); setBest_(null); }, []);
+
+  useEffect(() => {
+    if (screen === "gameOver") setBest_(maybeSaveBest(wv, sc));
+  }, [screen, wv, sc]);
 
   /* ─── Refs ─── */
   const cvRef = useRef<HTMLCanvasElement | null>(null);
@@ -269,7 +278,10 @@ export default function App() {
 
   /* ─── Screen Routing ─── */
   if (screen === "menu") {
-    return <MenuScreen diff={diff} setDiff={setDiff} start={start} setScreen={setScreen} />;
+    return <MenuScreen
+      diff={diff} setDiff={setDiff} start={start} setScreen={setScreen}
+      best={best_} resetBest={resetBest}
+    />;
   }
 
   if (screen === "vocab") {

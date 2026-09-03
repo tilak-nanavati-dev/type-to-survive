@@ -1,12 +1,15 @@
 import { P } from "../styles/shared";
 import { PUPS } from "../data/config";
 import type { DifficultyPreset, Screen, SetState, PowerUpType } from "../types/game";
+import type { BestRun } from "../utils/storage";
 
 interface MenuScreenProps {
   diff: DifficultyPreset;
   setDiff: SetState<DifficultyPreset>;
   start: () => void;
   setScreen: SetState<Screen>;
+  best: BestRun | null;
+  resetBest: () => void;
 }
 
 const DIFF_META: Record<DifficultyPreset, { label: string; blurb: string; color: string }> = {
@@ -16,7 +19,7 @@ const DIFF_META: Record<DifficultyPreset, { label: string; blurb: string; color:
   adaptive:     { label: "Adaptive",     blurb: "Scales to your accuracy",    color: "#fbbf24" },
 };
 
-export default function MenuScreen({ diff, setDiff, start, setScreen }: MenuScreenProps) {
+export default function MenuScreen({ diff, setDiff, start, setScreen, best, resetBest }: MenuScreenProps) {
   return (
     <div style={{
       minHeight: "100vh",
@@ -104,6 +107,32 @@ export default function MenuScreen({ diff, setDiff, start, setScreen }: MenuScre
               📊 Stats
             </button>
           </div>
+
+          {best && (
+            <div style={{
+              marginTop: 16, padding: "8px 12px", borderRadius: 8,
+              background: "linear-gradient(90deg, rgba(251,191,36,0.10) 0%, rgba(251,191,36,0.02) 100%)",
+              border: "1px solid rgba(251,191,36,0.28)",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}>
+              <span style={{ color: "#fcd34d", fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>
+                🏆 Best · Wave {best.wave} · {best.score.toLocaleString()}
+              </span>
+              <button
+                onClick={() => {
+                  if (confirm("Reset your best score? This can't be undone.")) resetBest();
+                }}
+                style={{
+                  background: "transparent", border: "none", cursor: "pointer",
+                  color: "#64748b", fontSize: 9, fontFamily: "inherit",
+                  letterSpacing: 1, textTransform: "uppercase", padding: "2px 4px",
+                }}
+                title="Reset best score"
+              >
+                Reset
+              </button>
+            </div>
+          )}
         </div>
 
         {/* RIGHT: difficulty + intel */}
@@ -181,6 +210,12 @@ export default function MenuScreen({ diff, setDiff, start, setScreen }: MenuScre
             <span style={{ color: "#fbbf24" }}>Backspace</span> — undo ·{" "}
             <span style={{ color: "#fbbf24" }}>Esc</span> — clear target ·{" "}
             <span style={{ color: "#fbbf24" }}>Click</span> — collect drops
+            <div style={{
+              marginTop: 8, paddingTop: 8, borderTop: "1px dashed rgba(255,255,255,0.06)",
+              color: "#64748b", fontSize: 10,
+            }}>
+              ⌨ Best played on a physical keyboard
+            </div>
           </div>
         </div>
       </div>
