@@ -142,11 +142,9 @@ export default function useKeyboardInput(
               });
             }
 
-            if (target.tp === "vocab" || Math.random() < 0.22) {
-              setVcard(target.vc);
-              if (vtRef.current) clearTimeout(vtRef.current);
-              vtRef.current = setTimeout(() => setVcard(null), 3500);
-            }
+            setVcard(target.vc);
+            if (vtRef.current) clearTimeout(vtRef.current);
+            vtRef.current = setTimeout(() => setVcard(null), 3500);
 
             setWlog(l => [...l, {
               word: target.vc.word,

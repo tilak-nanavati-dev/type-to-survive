@@ -22,10 +22,16 @@ export const ZTYPES: Record<ZombieType, ZombieTypeDef> = {
   boss:     { speed: 0.16, color: "#ef4444", emoji: "👹", size: 30 },
 };
 
+// Power-ups drop from killed zombies (see useKeyboardInput.ts) and are
+// collected by clicking their glowing icon on the canvas (see App.tsx collectPU).
 export const PUPS: Record<PowerUpType, PowerUpDef> = {
+  // Slows all zombies to 12% speed for 5 seconds — buys typing breathing room.
   freeze: { name: "Freeze", icon: "❄️", color: "#67e8f9" },
+  // Absorbs the next zombie hit at the base for 8 seconds — one free save.
   shield: { name: "Shield", icon: "🛡️", color: "#a78bfa" },
+  // Instantly restores +25 HP (capped at 100) — emergency healing.
   heal:   { name: "Heal",   icon: "💚", color: "#4ade80" },
+  // Vaporizes the 3 nearest zombies and awards +40 score per kill — panic button.
   blast:  { name: "Blast",  icon: "💥", color: "#fb923c" },
 };
 

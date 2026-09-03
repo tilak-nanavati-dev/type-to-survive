@@ -13,8 +13,20 @@ export function useDraw() {
     const ctx = canvas.getContext("2d")!;
     ctx.clearRect(0, 0, CW, CH);
 
-    ctx.strokeStyle = "rgba(34,211,238,0.03)";
-    ctx.lineWidth = 2;
+    // Base gradient — radial fade from center outward
+    const bgGrad = ctx.createRadialGradient(CX, CY, 40, CX, CY, Math.max(CW, CH) * 0.7);
+    bgGrad.addColorStop(0, "#141428");
+    bgGrad.addColorStop(0.6, "#0d0d18");
+    bgGrad.addColorStop(1, "#050510");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, CW, CH);
+
+    // Grid — fades toward corners
+    const gridFade = ctx.createRadialGradient(CX, CY, 60, CX, CY, 380);
+    gridFade.addColorStop(0, "rgba(34,211,238,0.09)");
+    gridFade.addColorStop(1, "rgba(34,211,238,0.01)");
+    ctx.strokeStyle = gridFade;
+    ctx.lineWidth = 1;
     for (let x = 0; x < CW; x += 40) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CH); ctx.stroke();
     }
@@ -22,10 +34,24 @@ export function useDraw() {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke();
     }
 
-    ctx.strokeStyle = "rgba(239,68,68,0.05)";
-    for (let r = 60; r < 260; r += 65) {
+    // Range rings — pulsing breath
+    const pulse = 0.5 + Math.sin(Date.now() / 900) * 0.5;
+    for (let i = 0; i < 4; i++) {
+      const r = 65 + i * 55;
+      const alpha = 0.04 + (i === 1 ? pulse * 0.05 : 0);
+      ctx.strokeStyle = `rgba(239,68,68,${alpha})`;
+      ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(CX, CY, r, 0, 6.28); ctx.stroke();
     }
+
+    // Base perimeter glow
+    ctx.save();
+    const perim = ctx.createRadialGradient(CX, CY, 20, CX, CY, 55);
+    perim.addColorStop(0, "rgba(34,211,238,0.18)");
+    perim.addColorStop(1, "rgba(34,211,238,0)");
+    ctx.fillStyle = perim;
+    ctx.beginPath(); ctx.arc(CX, CY, 55, 0, 6.28); ctx.fill();
+    ctx.restore();
 
     const tgt = g.z.find(z => z.id === g.tid);
     const barrelAngle = tgt
@@ -34,11 +60,24 @@ export function useDraw() {
 
     if (tgt) {
       ctx.save();
-      ctx.strokeStyle = "rgba(251,191,36,0.3)";
+      const dashOffset = -(Date.now() / 80) % 10;
+      ctx.strokeStyle = "rgba(251,191,36,0.55)";
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]);
+      ctx.lineDashOffset = dashOffset;
       ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(tgt.x, tgt.y); ctx.stroke();
       ctx.setLineDash([]);
+
+      // Arrowhead near target
+      const ang = Math.atan2(tgt.y - CY, tgt.x - CX);
+      const ax = tgt.x - Math.cos(ang) * (tgt.sz + 12);
+      const ay = tgt.y - Math.sin(ang) * (tgt.sz + 12);
+      ctx.fillStyle = "rgba(251,191,36,0.75)";
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(ax - Math.cos(ang - 0.4) * 8, ay - Math.sin(ang - 0.4) * 8);
+      ctx.lineTo(ax - Math.cos(ang + 0.4) * 8, ay - Math.sin(ang + 0.4) * 8);
+      ctx.closePath(); ctx.fill();
       ctx.restore();
     }
 
@@ -180,13 +219,18 @@ export function useDraw() {
     }
 
     if (g.pau) {
-      ctx.fillStyle = "rgba(0,0,0,0.45)";
+      ctx.fillStyle = "rgba(5,5,15,0.65)";
       ctx.fillRect(0, 0, CW, CH);
-
-      ctx.font = "bold 28px monospace";
+      ctx.save();
+      ctx.shadowColor = "#fbbf24"; ctx.shadowBlur = 20;
+      ctx.font = "bold 36px monospace";
       ctx.textAlign = "center";
       ctx.fillStyle = "#fbbf24";
-      ctx.fillText("PAUSED", CW / 2, CH / 2);
+      ctx.fillText("⏸ PAUSED", CW / 2, CH / 2);
+      ctx.restore();
+      ctx.font = "11px monospace";
+      ctx.fillStyle = "#64748b";
+      ctx.fillText("switch tab to resume", CW / 2, CH / 2 + 26);
     }
   }, []);
 }

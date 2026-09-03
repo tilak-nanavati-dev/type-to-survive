@@ -149,42 +149,80 @@ export default function PlayingScreen({
       </div>
 
       {/* MINI DASHBOARD */}
-      <div style={{ width: "100%", maxWidth: CW, display: "flex", gap: 6, marginTop: 6 }}>
-        <div style={{ ...P.pn, flex: 1, padding: "6px 10px" }}>
-          <div style={{ color: "#64748b", fontSize: 8, textTransform: "uppercase" }}>WPM Trend</div>
-          <div style={{ height: 40 }}>
+      <div style={{ width: "100%", maxWidth: CW, display: "flex", gap: 8, marginTop: 8 }}>
+        {/* WPM trend */}
+        <div style={{
+          flex: 1, padding: "8px 12px", borderRadius: 10,
+          background: "linear-gradient(140deg, rgba(34,211,238,0.08) 0%, rgba(12,12,28,0.85) 100%)",
+          border: "1px solid rgba(34,211,238,0.22)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+            <span style={{ color: "#7dd3fc", fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700 }}>
+              ⚡ WPM Trend
+            </span>
+            <span style={{ color: "#22d3ee", fontSize: 12, fontWeight: 800 }}>{curWpm}</span>
+          </div>
+          <div style={{ height: 38 }}>
             {wpmH.length > 2 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={wpmH.slice(-15)}>
-                  <Line type="monotone" dataKey="wpm" stroke="#22d3ee" strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="wpm" stroke="#22d3ee" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ color: "#334155", fontSize: 9, paddingTop: 10 }}>Collecting data...</div>
+              <div style={{ color: "#334155", fontSize: 9, paddingTop: 12 }}>Collecting data…</div>
             )}
           </div>
         </div>
 
-        <div style={{ ...P.pn, flex: 1, padding: "6px 10px" }}>
-          <div style={{ color: "#64748b", fontSize: 8, textTransform: "uppercase" }}>Accuracy</div>
-          <div style={{ height: 40 }}>
+        {/* Accuracy */}
+        <div style={{
+          flex: 1, padding: "8px 12px", borderRadius: 10,
+          background: "linear-gradient(140deg, rgba(74,222,128,0.08) 0%, rgba(12,12,28,0.85) 100%)",
+          border: "1px solid rgba(74,222,128,0.22)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+            <span style={{ color: "#86efac", fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700 }}>
+              ◎ Accuracy
+            </span>
+            <span style={{ color: "#4ade80", fontSize: 12, fontWeight: 800 }}>{acc}%</span>
+          </div>
+          <div style={{ height: 38 }}>
             {wpmH.length > 2 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={wpmH.slice(-15)}>
-                  <Area type="monotone" dataKey="acc" stroke="#4ade80" fill="#4ade8012" strokeWidth={1.5} />
+                  <Area type="monotone" dataKey="acc" stroke="#4ade80" fill="#4ade8022" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ color: "#334155", fontSize: 9, paddingTop: 10 }}>Collecting data...</div>
+              <div style={{ color: "#334155", fontSize: 9, paddingTop: 12 }}>Collecting data…</div>
             )}
           </div>
         </div>
 
-        <div style={{ ...P.pn, padding: "6px 14px", display: "flex", alignItems: "center", gap: 12 }}>
-          {([["Killed", wc, "#4ade80"], ["Missed", wm, "#ef4444"], ["Best", best, "#fbbf24"]] as [string, number, string][]).map(([label, value, color]) => (
-            <div key={label} style={{ textAlign: "center" }}>
-              <div style={{ color, fontSize: 14, fontWeight: 800 }}>{value}</div>
-              <div style={{ color: "#64748b", fontSize: 7, textTransform: "uppercase" }}>{label}</div>
+        {/* Combat log */}
+        <div style={{
+          padding: "8px 12px", borderRadius: 10,
+          background: "linear-gradient(140deg, rgba(251,191,36,0.06) 0%, rgba(12,12,28,0.85) 100%)",
+          border: "1px solid rgba(251,191,36,0.22)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+          display: "flex", alignItems: "center", gap: 14,
+        }}>
+          {([
+            ["Kills",  wc,   "#4ade80", "☠"],
+            ["Missed", wm,   "#ef4444", "✕"],
+            ["Best",   best, "#fbbf24", "★"],
+          ] as [string, number, string, string][]).map(([label, value, color, icon]) => (
+            <div key={label} style={{ textAlign: "center", minWidth: 42 }}>
+              <div style={{ color, fontSize: 17, fontWeight: 800, lineHeight: 1 }}>
+                <span style={{ fontSize: 10, opacity: 0.7, marginRight: 3 }}>{icon}</span>
+                {value}
+              </div>
+              <div style={{ color: "#64748b", fontSize: 8, textTransform: "uppercase", letterSpacing: 1, marginTop: 3 }}>
+                {label}
+              </div>
             </div>
           ))}
         </div>
